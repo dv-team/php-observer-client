@@ -1,6 +1,7 @@
 {
     "name": "dv-team/observer-client",
     "description": "Observer client",
+    "license": "MIT",
     "require": {
         "php": ">= 8.1",
         "psr/http-factory": "^1.1",
