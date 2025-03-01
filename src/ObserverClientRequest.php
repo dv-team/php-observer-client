@@ -5,7 +5,7 @@ namespace Observer\Client;
 use DateTimeInterface;
 
 class ObserverClientRequest {
-	public ?DateTimeInterface $nextPingAt;
+	public ?DateTimeInterface $nextPingAt = null;
 	public null|array|object $data = null;
 	public int $runtime = 0;
 	
