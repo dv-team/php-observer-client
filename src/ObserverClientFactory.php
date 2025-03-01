@@ -17,12 +17,13 @@ class ObserverClientFactory {
 	 * @param string $endpoint
 	 * @return ObserverClient
 	 */
-	public function createClient(string $endpoint): ObserverClient {
+	public function createClient(string $endpoint, string $groupKey): ObserverClient {
 		return new ObserverClient(
 			requestFactory: $this->requestFactory,
 			uriFactory: $this->uriFactory,
 			client: $this->client,
-			endpoint: $endpoint
+			endpoint: $endpoint,
+			groupKey: $groupKey
 		);
 	}
 }

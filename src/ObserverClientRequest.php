@@ -7,7 +7,7 @@ use DateTimeInterface;
 class ObserverClientRequest {
 	public ?DateTimeInterface $nextPingAt;
 	public null|array|object $data = null;
-	public int $runtime;
+	public int $runtime = 0;
 	
 	public function __construct(
 		public readonly string $groupKey,

@@ -12,12 +12,13 @@ class ObserverClient {
 		private readonly RequestFactoryInterface $requestFactory,
 		private readonly UriFactoryInterface $uriFactory,
 		private readonly ClientInterface $client,
-		private readonly string $endpoint
+		private readonly string $endpoint,
+		private readonly string $groupKey
 	) {}
 	
-	public function createRequest(string $groupKey, string $observableKey): ObserverClientRequest {
+	public function createRequest(string $observableKey, ?string $groupKey = null): ObserverClientRequest {
 		return new ObserverClientRequest(
-			groupKey: $groupKey,
+			groupKey: $groupKey ?? $this->groupKey,
 			observableKey: $observableKey
 		);
 	}
