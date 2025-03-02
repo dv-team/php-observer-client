@@ -6,6 +6,7 @@ use DateTime;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
+use RuntimeException;
 
 class ObserverClient {
 	public function __construct(
@@ -45,7 +46,11 @@ class ObserverClient {
 		
 		$request = $this->requestFactory->createRequest('GET', $uri);
 		$response = $this->client->sendRequest($request);
-		echo $response->getBody()->getContents();
+		$responseRaw = $response->getBody()->getContents();
+		$responseData = json_decode(json: $responseRaw, associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
+		if($responseData !== true) {
+			throw new RuntimeException('Something went wrong');
+		}
 	}
 	
 	private static function setKey(string $query, string $key, string|array $value): string {
