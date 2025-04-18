@@ -3,6 +3,7 @@
 namespace Observer\Client;
 
 use DateTime;
+use JsonException;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
@@ -47,15 +48,16 @@ class ObserverClient {
 		$request = $this->requestFactory->createRequest('GET', $uri);
 		$response = $this->client->sendRequest($request);
 		$responseRaw = $response->getBody()->getContents();
-		if($response->getStatusCode() >= 400) {
-			throw new ObserverException("Something went wrong; HTTP {$response->getStatusCode()}; Response = {$responseRaw}");
-		}
-		$responseData = json_decode(json: $responseRaw, associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
-		if($responseData !== true) {
-			if(is_array($responseData) && isset($responseData['error'])) {
-				throw new ObserverException("Observer: {$responseData['error']}");
+		try {
+			$responseData = json_decode(json: $responseRaw, associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
+			if($responseData !== true) {
+				if(is_array($responseData) && isset($responseData['error'])) {
+					throw new ObserverException("Observer: {$responseData['error']}");
+				}
+				throw new ObserverException('Observer: Something went wrong');
 			}
-			throw new ObserverException('Observer: Something went wrong');
+		} catch(JsonException) {
+			throw new ObserverException("Something went wrong; HTTP {$response->getStatusCode()}; Response = {$responseRaw}");
 		}
 	}
 	
