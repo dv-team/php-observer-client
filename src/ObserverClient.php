@@ -48,11 +48,14 @@ class ObserverClient {
 		$response = $this->client->sendRequest($request);
 		$responseRaw = $response->getBody()->getContents();
 		if($response->getStatusCode() >= 400) {
-			throw new RuntimeException("Something went wrong; HTTP {$response->getStatusCode()}; Response = {$responseRaw}");
+			throw new ObserverException("Something went wrong; HTTP {$response->getStatusCode()}; Response = {$responseRaw}");
 		}
 		$responseData = json_decode(json: $responseRaw, associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
 		if($responseData !== true) {
-			throw new RuntimeException('Something went wrong');
+			if(is_array($responseData) && isset($responseData['error'])) {
+				throw new ObserverException("Observer: {$responseData['error']}");
+			}
+			throw new ObserverException('Observer: Something went wrong');
 		}
 	}
 	
