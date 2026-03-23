@@ -24,7 +24,23 @@ class ObserverClient {
 		);
 	}
 
-	public function ping(ObserverClientRequest $observerRequest): void {
+	/**
+	 * @template T of mixed|null
+	 * @param ObserverClientRequest $observerRequest
+	 * @param null|callable(ObserverClientRequest): T $fn
+	 * @return T
+	 * @throws \Psr\Http\Client\ClientExceptionInterface
+	 */
+	public function ping(ObserverClientRequest $observerRequest, $fn = null) {
+		/** @var T $result */
+		$result = null;
+		if($fn !== null) {
+			$timer = microtime(true);
+			$result = $fn($observerRequest);
+			$timer = microtime(true) - $timer;
+			$observerRequest->setRuntime($timer);
+		}
+
 		$uri = $this->uriFactory->createUri($this->endpoint);
 		$query = $uri->getQuery();
 		$query = self::setKey($query, 'groupKey', $observerRequest->groupKey);
@@ -59,6 +75,8 @@ class ObserverClient {
 		} catch(JsonException) {
 			throw new ObserverException("Something went wrong; HTTP {$response->getStatusCode()}; Response = {$responseRaw}");
 		}
+
+		return $result;
 	}
 
 	/**
