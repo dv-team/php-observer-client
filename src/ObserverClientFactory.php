@@ -12,7 +12,7 @@ class ObserverClientFactory {
 		private readonly UriFactoryInterface $uriFactory,
 		private readonly ClientInterface $client,
 	) {}
-	
+
 	/**
 	 * @param string $endpoint
 	 * @return ObserverClient
