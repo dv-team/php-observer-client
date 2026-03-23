@@ -48,6 +48,7 @@ class ObserverClient {
 		$response = $this->client->sendRequest($request);
 		$responseRaw = $response->getBody()->getContents();
 		try {
+			/** @var null|true|array{error?: string} $responseData */
 			$responseData = json_decode(json: $responseRaw, associative: true, depth: 512, flags: JSON_THROW_ON_ERROR);
 			if($responseData !== true) {
 				if(is_array($responseData) && isset($responseData['error'])) {
@@ -60,7 +61,13 @@ class ObserverClient {
 		}
 	}
 
-	private static function setKey(string $query, string $key, string|array $value): string {
+	/**
+	 * @param string $query
+	 * @param string $key
+	 * @param int|float|string|array<array-key, mixed>|object $value
+	 * @return string
+	 */
+	private static function setKey(string $query, string $key, int|float|string|array|object $value): string {
 		parse_str($query, $params);
 		$params[$key] = $value;
 

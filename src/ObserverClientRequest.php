@@ -4,8 +4,12 @@ namespace Observer\Client;
 
 use DateTimeInterface;
 
+/**
+ * @phpstan-type TDataType array<string, mixed>|object
+ */
 class ObserverClientRequest {
 	public ?DateTimeInterface $nextPingAt = null;
+	/** @var null|TDataType */
 	public null|array|object $data = null;
 	public int $runtime = 0;
 
@@ -26,6 +30,10 @@ class ObserverClientRequest {
 		return $this;
 	}
 
+	/**
+	 * @param null|TDataType $data
+	 * @return $this
+	 */
 	public function setData(null|array|object $data): self {
 		$this->data = $data;
 
