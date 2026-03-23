@@ -11,14 +11,14 @@ class ObserverClientRequest {
 	public ?DateTimeInterface $nextPingAt = null;
 	/** @var null|TDataType */
 	public null|array|object $data = null;
-	public int $runtime = 0;
+	public int|float $runtime = 0;
 
 	public function __construct(
 		public readonly string $groupKey,
 		public readonly string $observableKey,
 	) {}
 
-	public function setRuntime(int $runtime): self {
+	public function setRuntime(int|float $runtime): self {
 		$this->runtime = $runtime;
 
 		return $this;
