@@ -28,7 +28,7 @@ class ObserverClient {
 	 * @template T of mixed|null
 	 * @param ObserverClientRequest $observerRequest
 	 * @param null|callable(ObserverClientRequest): T $fn
-	 * @return T
+	 * @return ($fn is null ? null : T)
 	 * @throws \Psr\Http\Client\ClientExceptionInterface
 	 */
 	public function ping(ObserverClientRequest $observerRequest, $fn = null) {
