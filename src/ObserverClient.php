@@ -8,7 +8,32 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 
+/**
+ * Sends heartbeat and schedule metadata to an observer endpoint.
+ *
+ * Example:
+ * <code>
+ * $request = $client->createRequest(observableKey: 'nightly-import')
+ *     ->setCaption(caption: 'Nightly import')
+ *     ->setCron(cron: '0 2 * * *');
+ * $client->ping(observerRequest: $request);
+ * </code>
+ */
 class ObserverClient {
+	/**
+	 * Builds a client for one observer endpoint and one default group key.
+	 *
+	 * Example:
+	 * <code>
+	 * $client = new ObserverClient(
+	 *     requestFactory: $requestFactory,
+	 *     uriFactory: $uriFactory,
+	 *     client: $httpClient,
+	 *     endpoint: 'https://observer.example/ping',
+	 *     groupKey: 'imports'
+	 * );
+	 * </code>
+	 */
 	public function __construct(
 		private readonly RequestFactoryInterface $requestFactory,
 		private readonly UriFactoryInterface $uriFactory,
@@ -17,6 +42,20 @@ class ObserverClient {
 		private readonly string $groupKey,
 	) {}
 
+	/**
+	 * Creates a mutable request object for one observable.
+	 *
+	 * Example:
+	 * <code>
+	 * $request = $client->createRequest(observableKey: 'invoice-sync')
+	 *     ->setCaption(caption: 'Sync ERP invoices')
+	 *     ->setTimeString(timeString: 'every weekday at 07:00');
+	 * </code>
+	 *
+	 * @param string $observableKey Unique identifier of the observable inside the group.
+	 * @param null|string $groupKey Optional override for the client's default group key.
+	 * @return ObserverClientRequest New request object ready for further customization.
+	 */
 	public function createRequest(string $observableKey, ?string $groupKey = null): ObserverClientRequest {
 		return new ObserverClientRequest(
 			groupKey: $groupKey ?? $this->groupKey,
@@ -25,10 +64,30 @@ class ObserverClient {
 	}
 
 	/**
+	 * Sends the request to the observer service and optionally measures a callback runtime.
+	 *
+	 * Example:
+	 * <code>
+	 * $client->ping(
+	 *     observerRequest: $client->createRequest(observableKey: 'healthcheck')
+	 * );
+	 * </code>
+	 *
+	 * Example with runtime measurement:
+	 * <code>
+	 * $processed = $client->ping(
+	 *     observerRequest: $client->createRequest(observableKey: 'sync-users'),
+	 *     fn: function (ObserverClientRequest $request): int {
+	 *         return 42;
+	 *     }
+	 * );
+	 * </code>
+	 *
 	 * @template T of mixed|null
-	 * @param ObserverClientRequest $observerRequest
-	 * @param null|callable(ObserverClientRequest): T $fn
-	 * @return ($fn is null ? null : T)
+	 * @param ObserverClientRequest $observerRequest Request payload to send.
+	 * @param null|callable(ObserverClientRequest): T $fn Optional callback whose runtime should be measured.
+	 * @return ($fn is null ? null : T) The callback result, if a callback was provided.
+	 * @throws ObserverException When the observer rejects the ping or returns malformed JSON.
 	 * @throws \Psr\Http\Client\ClientExceptionInterface
 	 */
 	public function ping(ObserverClientRequest $observerRequest, $fn = null) {
@@ -92,10 +151,21 @@ class ObserverClient {
 	}
 
 	/**
-	 * @param string $query
-	 * @param string $key
-	 * @param int|float|string|array<array-key, mixed>|object $value
-	 * @return string
+	 * Adds or replaces a single key in a raw query string.
+	 *
+	 * Example:
+	 * <code>
+	 * self::setKey(
+	 *     query: 'groupKey=imports',
+	 *     key: 'observableKey',
+	 *     value: 'invoice-sync'
+	 * );
+	 * </code>
+	 *
+	 * @param string $query Existing raw query string.
+	 * @param string $key Query parameter name to add or replace.
+	 * @param int|float|string|array<array-key, mixed>|object $value Encodable query parameter value.
+	 * @return string Query string containing the provided key and value.
 	 */
 	private static function setKey(string $query, string $key, int|float|string|array|object $value): string {
 		parse_str($query, $params);
