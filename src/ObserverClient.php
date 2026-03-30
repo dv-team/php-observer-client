@@ -54,10 +54,12 @@ class ObserverClient {
 			$query = self::setKey($query, 'caption', $observerRequest->caption);
 		}
 
-		if($observerRequest->schedule !== null) {
-			[$scheduleValue, $scheduleType] = $observerRequest->schedule;
-			$query = self::setKey($query, 'schedule', $scheduleValue);
-			$query = self::setKey($query, 'schedule_type', $scheduleType);
+		if($observerRequest->cron !== null) {
+			$query = self::setKey($query, 'cron', $observerRequest->cron);
+		}
+
+		if($observerRequest->timeString !== null) {
+			$query = self::setKey($query, 'time-string', $observerRequest->timeString);
 		}
 
 		if($observerRequest->runtime > 0) {
