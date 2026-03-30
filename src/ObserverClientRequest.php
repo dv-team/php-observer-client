@@ -14,6 +14,7 @@ class ObserverClientRequest {
 	public ?DateTimeInterface $nextPingAt = null;
 	/** @var null|TDataType */
 	public null|array|object $data = null;
+	public ?string $caption = null;
 	/** @var null|TSchedule */
 	public ?array $schedule = null;
 	public int|float $runtime = 0;
@@ -31,6 +32,12 @@ class ObserverClientRequest {
 
 	public function expectNextPingAt(?DateTimeInterface $nextPingAt): self {
 		$this->nextPingAt = $nextPingAt;
+
+		return $this;
+	}
+
+	public function setCaption(?string $caption): self {
+		$this->caption = $caption;
 
 		return $this;
 	}

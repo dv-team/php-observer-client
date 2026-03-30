@@ -50,6 +50,10 @@ class ObserverClient {
 			$query = self::setKey($query, 'nextPingAt', $observerRequest->nextPingAt->format('c'));
 		}
 
+		if($observerRequest->caption !== null) {
+			$query = self::setKey($query, 'caption', $observerRequest->caption);
+		}
+
 		if($observerRequest->schedule !== null) {
 			[$scheduleValue, $scheduleType] = $observerRequest->schedule;
 			$query = self::setKey($query, 'schedule', $scheduleValue);
